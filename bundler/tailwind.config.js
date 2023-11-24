@@ -8,6 +8,10 @@ const pxToRem = (px) => {
   return px / base
 }
 
+const pxToRemString = (value) => {
+  return pxToRem(value) + "rem"
+}
+
 const generateFontSize = () => {
   const fontSize = {}
 
@@ -16,7 +20,7 @@ const generateFontSize = () => {
 
   let size = minFontSize
   while (size <= maxFontSize) {
-    fontSize[size] = pxToRem(size) + "rem"
+    fontSize[size] = pxToRemString(size)
     size += 2
   }
 
@@ -31,7 +35,7 @@ const generateBorderRadius = () => {
 
   let radius = minRadius
   while (radius <= maxRadius) {
-    borderRadius[radius] = pxToRem(radius) + "rem"
+    borderRadius[radius] = pxToRemString(radius),
     radius += 2
   }
 
@@ -65,6 +69,10 @@ module.exports = {
         "mono": ['Space Mono', ...defaultTheme.fontFamily.mono],
       },
       fontSize: generateFontSize(),
+      spacing: {
+        4.5: pxToRemString(18),
+        6.5: pxToRemString(38),
+      },
       transitionDuration: { "DEFAULT": "300ms" }
     },
   },
