@@ -1,3 +1,4 @@
+import { useEffect, useRef, useState } from "react"
 import { createRoot } from "react-dom/client"
 import classnames from "classnames"
 
@@ -7,6 +8,54 @@ import settingsIcon from "./assets/icon-settings.svg"
 import "./index.css"
 
 const App = () => {
+  const timerRef = useRef<NodeJS.Timeout>(null)
+  const stopTimerRef = useRef<NodeJS.Timeout>(null)
+
+  const [timerDuration, setTimerDuration] = useState(0)
+  const [secondsElapsed, setSecondsElapsed] = useState(0)
+
+  const timeRemaining = timerDuration - secondsElapsed
+  const timeRemainingPercentage = (timeRemaining / timerDuration) * 100
+  const radius = 46
+  const circumference = 2 * Math.PI * radius
+  const strokeDasharray = `${circumference * (timeRemainingPercentage / 100)}, ${circumference}`
+
+  const startTimer = (seconds:number) => {
+    setTimerDuration(seconds)
+    setSecondsElapsed(0)
+
+    timerRef.current = setInterval(() => {
+      setSecondsElapsed(value => value + 1)
+    }, 1000)
+
+    stopTimerRef.current = setTimeout(() => {
+      clearInterval(timerRef.current)
+    }, seconds * 1000)
+  }
+
+  const padZero = (value:number):string => {
+    if (value < 10) {
+      return `0${value}`
+    }
+
+    return value.toString()
+  }
+
+  const formattedTimeRemaining = (() => {
+    let diff = timeRemaining
+
+    const seconds = Math.round(diff % 60)
+
+    diff = Math.floor(diff / 60)
+    const minutes = Math.floor(diff % 60)
+
+    return `${padZero(minutes)}:${padZero(seconds)}`
+  })()
+
+  useEffect(() => {
+    startTimer(1 * 60)
+  }, [])
+
   return (
     <main className="font-sans">
       <img src={logo} className="mx-auto mt-8" />
@@ -42,23 +91,24 @@ const App = () => {
         style={{ boxShadow: "50px 50px 100px 0px #121530, -50px -50px 100px 0px #272C5A" }}
       >
         <div className="relative w-full h-full flex flex-col items-center justify-center bg-blue-200 rounded-full">
-          <div className="absolute inset-0">
-            <svg
-              className="w-full h-full -rotate-90"
-              viewBox="0 0 100 100"
-              style={{
-                fill: "transparent",
-                stroke: "#F87070",
-                strokeWidth: "3",
-                strokeDasharray: 285,
-                strokeDashoffset: "0",
-                strokeLinecap: "round",
-              }}
-            >
-              <circle cx="50" cy="50" r="45" />
-            </svg>
-          </div>
-          <p className="text-80 font-bold text-gray-200">17:59</p>
+          {(timeRemainingPercentage > 0) && (
+            <div className="absolute inset-0">
+              <svg
+                className="w-full h-full -rotate-90 stroke-red transition-all"
+                viewBox="0 0 100 100"
+                style={{
+                  fill: "transparent",
+                  strokeWidth: "3",
+                  strokeDasharray,
+                  strokeDashoffset: "0",
+                  strokeLinecap: "round",
+                }}
+              >
+                <circle cx="50" cy="50" r={radius} />
+              </svg>
+            </div>
+          )}
+          <p className="text-80 font-bold text-gray-200">{formattedTimeRemaining}</p>
           <p className="text-center text-14 indent-3.5 tracking-[14px] font-bold text-gray-200">PAUSE</p>
         </div>
       </div>
