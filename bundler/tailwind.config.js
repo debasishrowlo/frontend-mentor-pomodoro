@@ -72,6 +72,7 @@ module.exports = {
       spacing: {
         4.5: pxToRemString(18),
         6.5: pxToRemString(38),
+        25: pxToRemString(100),
       },
       transitionDuration: { "DEFAULT": "300ms" }
     },
